@@ -22,7 +22,7 @@ const auth=getAuth(app),db=getDatabase(app),$=id=>document.getElementById(id);
 let uid='',room='',state=null,stop=null,clock=null,lastKey='',drawColor='#202020',drawing=false,history=[],startTime=0;
 const section=id=>['welcome','lobby','game','results'].forEach(x=>$(x).classList.toggle('hidden',x!==id));
 const msg=s=>$('notice').textContent=s;
-const err=e=>{console.error(e);const code=e?.code||'';msg(code.includes('permission-denied')?'Firebase 권한 오류: scribbleRooms 읽기/쓰기 Rules와 익명 로그인을 확인해 주세요.':code.includes('network')?'네트워크가 끊겼어요. 연결을 확인한 뒤 다시 시도해 주세요.':'연결 오류: '+(code||e?.message||e))};
+const err=e=>{console.error('[Scribble Firebase]',e);const code=String(e?.code||'').toLowerCase(),detail=String(e?.message||e||'알 수 없는 오류'),lower=detail.toLowerCase();if(code.includes('permission-denied')||code.includes('permission_denied')||lower.includes('permission_denied')||lower.includes('permission denied'))msg('Firebase 권한 오류: Realtime Database Rules에서 /scribbleRooms 읽기·쓰기가 허용되는지, Firebase 익명 로그인이 활성화되어 있는지 확인해 주세요.');else if(code.includes('network')||lower.includes('network'))msg('네트워크가 끊겼어요. 연결을 확인한 뒤 다시 시도해 주세요.');else msg('연결 오류: '+(code||detail))};
 const me=()=>($('nick').value.trim()||localStorage.getItem('scribble-nick')||'게스트').slice(0,18);
 const codegen=()=>Math.random().toString(36).slice(2,8).toUpperCase();
 const players=()=>Object.keys(state?.players||{}).sort((a,b)=>(state.players[a].joined||0)-(state.players[b].joined||0));
